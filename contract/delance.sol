@@ -26,6 +26,8 @@ contract Delance {
     event   RequestUnlocked(bool loked);
     event   RequestCreated(string title, uint256 amount, bool locked, bool paid);
     event   RequestPaid(address receiver, uint256 amount);
+    event   ProjectCompleted(address employer, address freelancer, uint256 amount, Status status);
+    event   ProjectCancled(uint256 remainingPayments, Status status);
 
     constructor (
         address payable _freelancer, 
@@ -61,6 +63,9 @@ contract Delance {
         _;
     }
 
+    function getBalance() public returns (uint256){
+        return address(this).balance;
+    }
 
     function createRequest(string memory _title, uint256 _amount) public onlyFreelancer {
         Request memory request = Request (
@@ -99,4 +104,24 @@ contract Delance {
         emit    RequestPaid(msg.sender, request.amount);
 
     }
+
+    function completeProject() public onlyEmployer onlyPendingProject {
+        status = Status.COMPLETED;
+        freelancer.transfer(remainingPayments);
+
+        emit ProjectCompleted(employer, freelancer, remainingPayments, status);
+    }
+
+    function cancelProject() public onlyEmployer onlyPendingProject {
+        require(now > deadline);
+        status = Status.CENCLED;
+        employer.transfer(remainingPayments);
+
+        emit ProjectCancled(remainingPayments, status);
+    }
+
+    function increaseDeadline(uint256 amount) public onlyEmployer onlyPendingProject {
+        deadline += amount;
+    }
+
 }
