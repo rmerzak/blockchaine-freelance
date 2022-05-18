@@ -44,12 +44,7 @@ contract DelanceFactory {
         );
         deployedProjects.push(project);
         addEmployerProjects(msg.sender, project);
-        addFreelancerProjects(_freelance, project);
-
-    // this part is not complete //    
-     /*   address payable receiver = payable(project.employer);
-        receiver.transfer(msg.value);*/
-
+        addFreelancerProjects(_freelance, project);   
     }
 
     function getDeployedProject() public view returns (Project[] memory) {
